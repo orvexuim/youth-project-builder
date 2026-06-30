@@ -1,80 +1,81 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
-import { motion } from 'framer-motion';
 
 export default function Navbar() {
-  const { user, logout } = useAuthStore();
+  const { user, token, logout } = useAuthStore();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [scrolled, setScrolled] = useState(false);
 
-  useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', fn);
-    return () => window.removeEventListener('scroll', fn);
-  }, []);
-
-  const isActive = (path) => location.pathname === path;
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
-    <motion.nav
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+    <nav className="fixed top-0 left-0 right-0 z-50 h-16 flex items-center px-6"
       style={{
-        background: scrolled ? 'rgba(10,10,15,0.9)' : 'transparent',
-        backdropFilter: scrolled ? 'blur(20px)' : 'none',
-        borderBottom: scrolled ? '1px solid rgba(255,255,255,0.06)' : '1px solid transparent',
-      }}
-    >
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        background: 'rgba(9,9,11,0.85)',
+        backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(255,248,235,0.07)',
+      }}>
+      <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
+
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white font-black text-sm"
-            style={{ background: 'linear-gradient(135deg,#8B5CF6,#3B82F6)' }}>Y</div>
-          <span className="font-black text-white text-base">Youth<span className="text-purple-400">Builder</span></span>
+        <Link to="/" className="flex items-center gap-2.5 group">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold"
+            style={{ background: 'linear-gradient(135deg,#C9A84C,#E8C97A)', color: '#09090b' }}>
+            Y
+          </div>
+          <span className="font-semibold text-sm tracking-wide"
+            style={{ color: 'rgba(245,240,232,0.9)' }}>
+            YouthBuilder
+          </span>
         </Link>
 
-        {/* Nav links */}
-        <div className="hidden md:flex items-center gap-1">
-          {[
-            { to: '/', label: 'Home' },
-            { to: '/pricing', label: 'Pricing' },
-          ].map(({ to, label }) => (
-            <Link key={to} to={to}
-              className={`px-4 py-2 text-sm rounded-lg transition-colors ${
-                isActive(to) ? 'text-white bg-white/[0.06]' : 'text-white/50 hover:text-white/80 hover:bg-white/[0.04]'
-              }`}>
-              {label}
-            </Link>
-          ))}
+        {/* Center links */}
+        <div className="hidden md:flex items-center gap-6">
+          <Link to="/"
+            className="text-sm transition-colors"
+            style={{ color: 'rgba(245,240,232,0.45)' }}
+            onMouseEnter={e => e.target.style.color = 'rgba(245,240,232,0.9)'}
+            onMouseLeave={e => e.target.style.color = 'rgba(245,240,232,0.45)'}>
+            Home
+          </Link>
+          <Link to="/pricing"
+            className="text-sm transition-colors"
+            style={{ color: 'rgba(245,240,232,0.45)' }}
+            onMouseEnter={e => e.target.style.color = 'rgba(245,240,232,0.9)'}
+            onMouseLeave={e => e.target.style.color = 'rgba(245,240,232,0.45)'}>
+            Pricing
+          </Link>
         </div>
 
-        {/* Auth */}
+        {/* Right actions */}
         <div className="flex items-center gap-3">
-          {user ? (
+          {token ? (
             <>
-              <Link to="/dashboard" className="btn btn-ghost text-sm py-2 px-4">Dashboard</Link>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
-                  style={{ background: 'linear-gradient(135deg,#8B5CF6,#3B82F6)' }}>
-                  {user.full_name?.[0]?.toUpperCase() || 'U'}
-                </div>
-                <button onClick={() => { logout(); navigate('/'); }}
-                  className="text-xs text-white/30 hover:text-white/60 transition-colors">
-                  Logout
-                </button>
-              </div>
+              <Link to="/dashboard" className="btn btn-ghost text-sm px-4 py-2">
+                Dashboard
+              </Link>
+              <button onClick={handleLogout} className="btn btn-ghost text-sm px-4 py-2">
+                Sign out
+              </button>
             </>
           ) : (
             <>
-              <Link to="/login" className="text-sm text-white/50 hover:text-white transition-colors">Sign in</Link>
-              <Link to="/register" className="btn btn-primary text-sm py-2 px-5">Get Started Free</Link>
+              <Link to="/login"
+                className="text-sm font-medium transition-colors"
+                style={{ color: 'rgba(245,240,232,0.5)' }}
+                onMouseEnter={e => e.target.style.color = 'rgba(245,240,232,0.9)'}
+                onMouseLeave={e => e.target.style.color = 'rgba(245,240,232,0.5)'}>
+                Sign in
+              </Link>
+              <Link to="/register" className="btn btn-primary text-sm px-5 py-2.5">
+                Get Started Free
+              </Link>
             </>
           )}
         </div>
       </div>
-    </motion.nav>
+    </nav>
   );
 }
